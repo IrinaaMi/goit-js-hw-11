@@ -104,6 +104,9 @@ async function onClickLoadMoreBtn() {
     renderImageList(response.hits);
     gallerySimpleLightbox.refresh();
     currentHits += response.hits.length;
+    if (currentHits >= response.totalHits) {
+        loadMoreBtn.style.display = 'none';
+        endText.style.display = 'block';
 
-
+    }
 }
