@@ -85,6 +85,10 @@ async function onSubmitSearchForm(e) {
             Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
             loadMoreBtn.style.display = 'none';
         }
+        if (response.hits.length < 40) {
+            loadMoreBtn.style.display = 'none';
+            endText.style.display = 'block'
+        }
     } catch (error) {
         console.log(error);
     }
@@ -99,8 +103,4 @@ async function onClickLoadMoreBtn() {
     gallerySimpleLightbox.refresh();
     currentHits += response.hits.length;
 
-    if (currentHits === response.totalHits) {
-        loadMoreBtn.style.display = 'none';
-        endText.style.display = 'block'
-    }
 }
