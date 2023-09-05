@@ -10,17 +10,18 @@ const loadMoreBtn = document.querySelector('.load-more');
 const endText = document.querySelector('.end-text')
 let gallerySimpleLightbox = new SimpleLightbox('.gallery a');
 
-
 let pageNumber = 1;
 let currentHits = 0;
 let searchQuery = '';
+const perPage = 40;
 
 loadMoreBtn.style.display = 'none';
 endText.style.display = 'none';
+
 async function fetchImages(value, page) {
     const url = 'https://pixabay.com/api/';
     const key = '31316931-6ed528a434bb816a44241a448';
-    const filter = `?key=${key}&q=${value}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40&page=${page}`;
+    const filter = `?key=${key}&q=${value}&image_type=photo&orientation=horizontal&safesearch=true&per_page=${perPage}&page=${page}`;
 
     return await axios.get(`${url}${filter}`).then(response => response.data);
 }
@@ -66,12 +67,16 @@ async function onSubmitSearchForm(e) {
     const response = await fetchImages(searchQuery, pageNumber);
     currentHits = response.hits.length;
 
-    if (response.totalHits > 40) {
+    if (response.totalHits > perPage) {
         loadMoreBtn.style.display = 'block';
+        endText.style.display = 'none';
     } else {
         loadMoreBtn.style.display = 'none';
     }
-
+    if (response.hits.length < perPage && response.hits.length > 0) {
+        loadMoreBtn.style.display = 'none';
+        endText.style.display = 'block';
+    }
     try {
         if (response.totalHits > 0) {
             Notiflix.Notify.success(`Hooray! We found ${response.totalHits} images.`);
@@ -84,10 +89,7 @@ async function onSubmitSearchForm(e) {
             gallery.innerHTML = '';
             Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
             loadMoreBtn.style.display = 'none';
-        }
-        if (response.hits.length < 40) {
-            loadMoreBtn.style.display = 'none';
-            endText.style.display = 'block'
+            endText.style.display = 'none';
         }
     } catch (error) {
         console.log(error);
@@ -102,5 +104,6 @@ async function onClickLoadMoreBtn() {
     renderImageList(response.hits);
     gallerySimpleLightbox.refresh();
     currentHits += response.hits.length;
+
 
 }
